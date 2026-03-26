@@ -28,7 +28,6 @@ The interface is designed to guide the user through the menu system in a simple 
      - The instructions panel appears, guiding the user on how to proceed.
      - The user can then press the **OKAY button** to confirm and continue.
 
-This flow ensures that the user always sees the main menu first, can explore options, and receives clear feedback if a game is not available yet. Once Chess is chosen, the instructions are shown to prepare the user before starting the game.
 ---
 
 ## Included Assets
