@@ -100,3 +100,6 @@ InitTestScene*.unity*
 Unity/Task2_CubeInteraction/Temp/
 Unity/Task2_CubeInteraction/Library/
 Unity/Task2_CubeInteraction/Temp/
+Unity/Task2_CubeInteraction/.vscode/
+Unity/Task2_CubeInteraction/UserSettings/
+Unity/Task2_CubeInteraction/*.slnx
