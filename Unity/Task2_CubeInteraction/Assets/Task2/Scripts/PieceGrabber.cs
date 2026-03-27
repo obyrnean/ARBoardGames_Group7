@@ -3,63 +3,66 @@ using UnityEngine.XR.ARFoundation;
 
 public class PieceGrabber : MonoBehaviour
 {
-    public float pinchThreshold = 0.02f;
-    public float grabDistance = 0.05f;
+    public float grabDistance = 0.1f;
 
-    private bool isGrabbing = false;
-    private GameObject grabbedObject;
+    private GameObject grabbedPiece = null;
     private Vector3 grabOffset;
-
-    private ARCameraManager arCameraManager;
+    private Camera arCamera;
 
     void Start()
     {
-        arCameraManager = FindFirstObjectByType<ARCameraManager>();
+        arCamera = Camera.main;
     }
 
     void Update()
     {
         if (Input.touchCount == 2)
         {
-            Touch thumb = Input.GetTouch(0);
-            Touch index = Input.GetTouch(1);
+            Touch touch0 = Input.GetTouch(0);
+            Touch touch1 = Input.GetTouch(1);
 
-            float pinchDistance = Vector2.Distance(thumb.position, index.position);
-            Vector2 midpoint = (thumb.position + index.position) / 2;
+            Vector2 midpoint = (touch0.position + touch1.position) / 2;
+            float pinchDistance = Vector2.Distance(touch0.position, touch1.position);
+            bool isPinching = pinchDistance < 100f;
 
-            Ray ray = Camera.main.ScreenPointToRay(midpoint);
+            Ray ray = arCamera.ScreenPointToRay(midpoint);
             RaycastHit hit;
 
-            bool isPinching = pinchDistance < pinchThreshold * Screen.dpi;
-
-            if (isPinching && !isGrabbing)
+            if (isPinching && grabbedPiece == null)
             {
                 if (Physics.Raycast(ray, out hit, grabDistance * 100))
                 {
-                    grabbedObject = hit.collider.gameObject;
-                    grabOffset = grabbedObject.transform.position - ray.GetPoint(hit.distance);
-                    isGrabbing = true;
+                    GameObject target = hit.collider.gameObject;
+                    // Only grab pieces, not the board
+                    if (target.name.Contains("King") || 
+                        target.name.Contains("Queen") ||
+                        target.name.Contains("Rook") ||
+                        target.name.Contains("Bishop") ||
+                        target.name.Contains("Knight") ||
+                        target.name.Contains("Pawn"))
+                    {
+                        grabbedPiece = target;
+                        grabOffset = grabbedPiece.transform.position - ray.GetPoint(hit.distance);
+                    }
                 }
             }
 
             if (!isPinching)
             {
-                isGrabbing = false;
-                grabbedObject = null;
+                grabbedPiece = null;
             }
 
-            if (isGrabbing && grabbedObject != null)
+            if (grabbedPiece != null)
             {
                 if (Physics.Raycast(ray, out hit))
                 {
-                    grabbedObject.transform.position = ray.GetPoint(hit.distance) + grabOffset;
+                    grabbedPiece.transform.position = ray.GetPoint(hit.distance) + grabOffset;
                 }
             }
         }
         else
         {
-            isGrabbing = false;
-            grabbedObject = null;
+            grabbedPiece = null;
         }
     }
 }

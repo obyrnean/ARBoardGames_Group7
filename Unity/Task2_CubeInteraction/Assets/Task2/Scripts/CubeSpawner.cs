@@ -5,11 +5,14 @@ using UnityEngine.XR.ARSubsystems;
 
 public class CubeSpawner : MonoBehaviour
 {
-    public GameObject cubePrefab;
+    public GameObject chessBoardPrefab;
+    public GameObject[] chessPiecePrefabs;
+
     private ARRaycastManager raycastManager;
-    private GameObject spawnedCube;
-    private Vector3 defaultSpawnPosition;
-    private bool cubeSpawned = false;
+    private GameObject spawnedBoard;
+    private List<GameObject> spawnedPieces = new List<GameObject>();
+    private List<Vector3> defaultPositions = new List<Vector3>();
+    private bool boardSpawned = false;
 
     void Start()
     {
@@ -18,7 +21,7 @@ public class CubeSpawner : MonoBehaviour
 
     void Update()
     {
-        if (cubeSpawned) return;
+        if (boardSpawned) return;
 
         if (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began)
         {
@@ -26,19 +29,18 @@ public class CubeSpawner : MonoBehaviour
             if (raycastManager.Raycast(Input.GetTouch(0).position, hits, TrackableType.PlaneWithinPolygon))
             {
                 Pose hitPose = hits[0].pose;
-                spawnedCube = Instantiate(cubePrefab, hitPose.position, hitPose.rotation);
-                defaultSpawnPosition = hitPose.position;
-                cubeSpawned = true;
+                spawnedBoard = Instantiate(chessBoardPrefab, hitPose.position, hitPose.rotation);
+                boardSpawned = true;
             }
         }
     }
 
-    public void ResetCube()
+    public void ResetPieces()
     {
-        if (spawnedCube != null)
+        for (int i = 0; i < spawnedPieces.Count; i++)
         {
-            spawnedCube.transform.position = defaultSpawnPosition;
-            spawnedCube.transform.rotation = Quaternion.identity;
+            if (spawnedPieces[i] != null)
+                spawnedPieces[i].transform.position = defaultPositions[i];
         }
     }
 }
