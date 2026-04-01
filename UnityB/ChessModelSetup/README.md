@@ -1,4 +1,4 @@
-# AR Chess Project
+# AR Chess Project - Ane O'Byrne
 
 This repository contains the scripts, used models, and materials to visualize a chessboard and pieces in **Augmented Reality (AR)** using Unity.  
 
