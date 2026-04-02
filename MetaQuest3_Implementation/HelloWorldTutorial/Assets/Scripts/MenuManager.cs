@@ -1,15 +1,19 @@
-﻿using UnityEngine;
+using UnityEngine;
 using TMPro;
 using System.Collections;
 
 public class MenuManager : MonoBehaviour
 {
-    [Header("UI References")]
+    [Header("UI Panels")]
     public TMP_Dropdown gameDropdown;
-    public GameObject mainMenuCanvas;
-    public GameObject unavailableCanvas;
-    public GameObject instructionsCanvas;
-    public GameObject inGameCanvas;
+
+    public GameObject mainMenuPanel;
+    public GameObject unavailablePanel;
+    public GameObject instructionsPanel;
+
+    [Header("Buttons")]
+    public GameObject rulesButton;
+    public GameObject exitButton;
 
     [Header("Game")]
     public GameObject chessBoardManager;
@@ -19,12 +23,7 @@ public class MenuManager : MonoBehaviour
 
     void Start()
     {
-        // Initial state
-        mainMenuCanvas.SetActive(true);
-        unavailableCanvas.SetActive(false);
-        instructionsCanvas.SetActive(false);
-        inGameCanvas.SetActive(false);
-        chessBoardManager.SetActive(false);
+        ResetToMainMenu();
     }
 
     // PLAY BUTTON
@@ -34,54 +33,79 @@ public class MenuManager : MonoBehaviour
 
         if (selectedGame == "Chess")
         {
-            // Hide main menu
-            mainMenuCanvas.SetActive(false);
+            mainMenuPanel.SetActive(false);
 
-            // Spawn chess board
             SpawnChessBoard();
 
-            // Show instructions on top
-            instructionsCanvas.SetActive(true);
+            // Show instructions first
+            instructionsPanel.SetActive(true);
 
-            // Enable in-game UI (rules + exit button)
-            inGameCanvas.SetActive(true);
+            // Hide buttons until OK is pressed
+            rulesButton.SetActive(false);
+            exitButton.SetActive(false);
         }
         else
         {
-            // Show unavailable message
             StartCoroutine(ShowUnavailable());
         }
     }
 
-    // SPAWN CHESS BOARD
+    // OK BUTTON (instructions)
+    public void OnInstructionsOK()
+    {
+        instructionsPanel.SetActive(false);
+
+        // Show buttons now
+        rulesButton.SetActive(true);
+        exitButton.SetActive(true);
+    }
+
+    // RULES BUTTON
+    public void OnRulesPressed()
+    {
+        instructionsPanel.SetActive(true);
+    }
+
+    // EXIT BUTTON
+    public void OnExitPressed()
+    {
+        ResetToMainMenu();
+    }
+
+    // SPAWN CHESS
     void SpawnChessBoard()
     {
         chessBoardManager.SetActive(true);
 
-        // Place in front of user (for AR/VR)
         Transform cam = Camera.main.transform;
         chessBoardManager.transform.position = cam.position + cam.forward * 1.5f;
     }
 
-    // UNAVAILABLE MESSAGE
+
+    // UNAVAILABLE FLOW
     IEnumerator ShowUnavailable()
     {
-        unavailableCanvas.SetActive(true);
+        mainMenuPanel.SetActive(false);
+        unavailablePanel.SetActive(true);
+
         yield return new WaitForSeconds(unavailableDisplayTime);
-        unavailableCanvas.SetActive(false);
+
+        unavailablePanel.SetActive(false);
+        mainMenuPanel.SetActive(true);
     }
 
-    public void OnExitToMenu()
+    // RESET EVERYTHING
+    void ResetToMainMenu()
     {
-        // Hide gameplay elements
-        instructionsCanvas.SetActive(false);
-        inGameCanvas.SetActive(false);
+        mainMenuPanel.SetActive(true);
+        unavailablePanel.SetActive(false);
+        instructionsPanel.SetActive(false);
+
+        rulesButton.SetActive(false);
+        exitButton.SetActive(false);
+
         chessBoardManager.SetActive(false);
 
-        // Show main menu again
-        mainMenuCanvas.SetActive(true);
-
-        // Optional: reset dropdown to default (Chess)
         gameDropdown.value = 0;
     }
 }
